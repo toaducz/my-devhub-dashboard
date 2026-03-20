@@ -1,4 +1,4 @@
-# ToanDucz DevHub Central - My Project Dashboard
+# My DevHub Dashboard - My Project Dashboard
 
 A centralized dashboard to manage all your deployed projects from Vercel, VPS, GitHub, and Docker.
 
