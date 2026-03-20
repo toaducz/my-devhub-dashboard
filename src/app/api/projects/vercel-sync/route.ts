@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createServerClient } from "@supabase/ssr";
 import { transformVercelProject } from "@/lib/vercel-api";
+import { requireAuth } from "@/lib/api-auth";
 
 // ─── POST /api/projects/vercel-sync ───────────────────────────────────────────
 // Sync Vercel projects to database: update existing or insert new
@@ -11,6 +12,9 @@ const VercelSyncSchema = z.object({
 });
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  const authError = await requireAuth(req);
+  if (authError) return authError;
+
   try {
     const body: unknown = await req.json();
     const parsed = VercelSyncSchema.safeParse(body);

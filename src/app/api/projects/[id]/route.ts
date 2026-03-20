@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseClient } from "@/lib/supabase";
 import { getProjectById } from "@/services/project-service";
+import { requireAuth } from "@/lib/api-auth";
 
 // ─── Zod schema ──────────────────────────────────────────────────────────────
 
@@ -51,6 +52,9 @@ export async function PUT(
   req: NextRequest,
   { params }: RouteParams
 ): Promise<NextResponse> {
+  const authError = await requireAuth(req);
+  if (authError) return authError;
+
   const { id } = await params;
   try {
     const body: unknown = await req.json();
@@ -100,6 +104,9 @@ export async function DELETE(
   _req: NextRequest,
   { params }: RouteParams
 ): Promise<NextResponse> {
+  const authError = await requireAuth(_req);
+  if (authError) return authError;
+
   const { id } = await params;
   try {
     const { error } = await supabaseClient

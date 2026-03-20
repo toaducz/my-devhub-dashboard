@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkProjectHealth } from "@/services/health-service";
+import { requireAuth } from "@/lib/api-auth";
 
 type RouteParams = { params: Promise<{ projectId: string }> };
 
@@ -11,6 +12,9 @@ export async function GET(
   _req: NextRequest,
   { params }: RouteParams
 ): Promise<NextResponse> {
+  const authError = await requireAuth(_req);
+  if (authError) return authError;
+
   const { projectId } = await params;
 
   try {

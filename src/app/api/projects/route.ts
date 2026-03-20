@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getAllProjects, createProject } from "@/services/project-service";
+import { requireAuth } from "@/lib/api-auth";
 
 // ─── Zod schema (RULE.md: Luôn validate dữ liệu từ API) ─────────────────────
 
@@ -35,6 +36,9 @@ export async function GET(): Promise<NextResponse> {
 // ─── POST /api/projects ──────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  const authError = await requireAuth(req);
+  if (authError) return authError;
+
   try {
     const body: unknown = await req.json();
     const parsed = CreateProjectSchema.safeParse(body);
