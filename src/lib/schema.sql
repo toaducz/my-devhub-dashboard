@@ -252,3 +252,41 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Cho phép anon role gọi hàm này
 GRANT EXECUTE ON FUNCTION public.update_project_health(UUID, TEXT, TIMESTAMPTZ) TO anon;
 GRANT EXECUTE ON FUNCTION public.update_project_health(UUID, TEXT, TIMESTAMPTZ) TO authenticated;
+
+-- ==========================================
+-- 8. PROJECT FIELDS RPC (SECURITY DEFINER)
+-- ==========================================
+
+-- Hàm update các trường của project, bypass RLS.
+-- Chỉ update field nào được truyền vào (không NULL).
+CREATE OR REPLACE FUNCTION public.update_project_fields(
+  p_id          UUID,
+  p_name        TEXT        DEFAULT NULL,
+  p_description TEXT        DEFAULT NULL,
+  p_url         TEXT        DEFAULT NULL,
+  p_category    TEXT        DEFAULT NULL,
+  p_platforms   TEXT[]      DEFAULT NULL,
+  p_tech_stack  TEXT[]      DEFAULT NULL,
+  p_is_live     BOOLEAN     DEFAULT NULL,
+  p_is_private  BOOLEAN     DEFAULT NULL,
+  p_status      TEXT        DEFAULT NULL
+)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE public.projects
+  SET
+    name        = COALESCE(p_name,        name),
+    description = COALESCE(p_description, description),
+    url         = COALESCE(p_url,         url),
+    category    = COALESCE(p_category,    category),
+    platforms   = COALESCE(p_platforms,   platforms),
+    tech_stack  = COALESCE(p_tech_stack,  tech_stack),
+    is_live     = COALESCE(p_is_live,     is_live),
+    is_private  = COALESCE(p_is_private,  is_private),
+    status      = COALESCE(p_status,      status)
+  WHERE id = p_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION public.update_project_fields(UUID, TEXT, TEXT, TEXT, TEXT, TEXT[], TEXT[], BOOLEAN, BOOLEAN, TEXT) TO anon;
+GRANT EXECUTE ON FUNCTION public.update_project_fields(UUID, TEXT, TEXT, TEXT, TEXT, TEXT[], TEXT[], BOOLEAN, BOOLEAN, TEXT) TO authenticated;

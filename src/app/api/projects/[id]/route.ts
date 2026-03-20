@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { z } from "zod";
-import { getServerClient } from "@/lib/supabase";
-import { ProjectRepository } from "@/lib/project-repository";
+import { supabaseClient } from "@/lib/supabase";
 import { getProjectById } from "@/services/project-service";
 
 // ─── Zod schema ──────────────────────────────────────────────────────────────
@@ -18,9 +16,9 @@ const UpdateProjectSchema = z.object({
   techStack: z.array(z.string()).optional(),
   isLive: z.boolean().optional(),
   isPrivate: z.boolean().optional(),
-  vercelProjectId: z.string().nullable().optional(),
-  healthStatus: z.enum(["healthy", "unhealthy", "unknown"]).nullable().optional(),
-  lastHealthCheck: z.string().nullable().optional(),
+  status: z
+    .enum(["online", "offline", "learning", "research", "archive"])
+    .optional(),
 });
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -65,27 +63,27 @@ export async function PUT(
       );
     }
 
-    // Dùng server client có cookies để auth.uid() khớp với user_id → RLS pass
-    const cookieStore = await cookies();
-    const supabase = getServerClient(cookieStore);
-    const repo = new ProjectRepository(supabase);
+    const d = parsed.data;
 
-    // Map camelCase → snake_case
-    const { name, description, url, category, platforms, techStack, isLive, isPrivate, vercelProjectId, healthStatus, lastHealthCheck } = parsed.data;
-    const dbUpdates: Record<string, unknown> = {};
-    if (name !== undefined) dbUpdates.name = name;
-    if (description !== undefined) dbUpdates.description = description;
-    if (url !== undefined) dbUpdates.url = url;
-    if (category !== undefined) dbUpdates.category = category;
-    if (platforms !== undefined) dbUpdates.platforms = platforms;
-    if (techStack !== undefined) dbUpdates.tech_stack = techStack;
-    if (isLive !== undefined) dbUpdates.is_live = isLive;
-    if (isPrivate !== undefined) dbUpdates.is_private = isPrivate;
-    if (vercelProjectId !== undefined) dbUpdates.vercel_project_id = vercelProjectId;
-    if (healthStatus !== undefined) dbUpdates.health_status = healthStatus;
-    if (lastHealthCheck !== undefined) dbUpdates.last_health_check = lastHealthCheck;
+    // Dùng SECURITY DEFINER RPC — bypass RLS, hoạt động cả local lẫn Vercel
+    const { error } = await supabaseClient.rpc("update_project_fields", {
+      p_id: id,
+      p_name: d.name ?? null,
+      p_description: d.description ?? null,
+      p_url: d.url ?? null,
+      p_category: d.category ?? null,
+      p_platforms: d.platforms ?? null,
+      p_tech_stack: d.techStack ?? null,
+      p_is_live: d.isLive ?? null,
+      p_is_private: d.isPrivate ?? null,
+      p_status: d.status ?? null,
+    });
 
-    await repo.updateProject(id, dbUpdates);
+    if (error) {
+      console.error(`[PUT /api/projects/${id}] RPC error:`, error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err: unknown) {
     console.error(`[PUT /api/projects/${id}]`, err);
@@ -104,11 +102,16 @@ export async function DELETE(
 ): Promise<NextResponse> {
   const { id } = await params;
   try {
-    const cookieStore = await cookies();
-    const supabase = getServerClient(cookieStore);
-    const repo = new ProjectRepository(supabase);
+    const { error } = await supabaseClient
+      .from("projects")
+      .delete()
+      .eq("id", id);
 
-    await repo.deleteProject(id);
+    if (error) {
+      console.error(`[DELETE /api/projects/${id}] error:`, error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err: unknown) {
     console.error(`[DELETE /api/projects/${id}]`, err);

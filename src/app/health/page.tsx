@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { fetchProjects } from "@/lib/project-repository";
@@ -23,7 +23,6 @@ export default function HealthPage() {
   );
   const [isCheckingAll, setIsCheckingAll] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const hasInitialCheck = useRef(false);
   const pathname = usePathname();
 
   // Fetch projects from Supabase
@@ -134,13 +133,6 @@ export default function HealthPage() {
     [checkProjectHealth]
   );
 
-  useEffect(() => {
-    // Run the initial health check once after projects first load
-    if (projects.length > 0 && !hasInitialCheck.current) {
-      hasInitialCheck.current = true;
-      checkAllProjects();
-    }
-  }, [projects, checkAllProjects]);
 
   const getStatusColor = (status: HealthStatus) => {
     switch (status) {
