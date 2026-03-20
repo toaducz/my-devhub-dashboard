@@ -3,6 +3,7 @@ import {
   createServerVercelClient,
   resolveVercelToken,
 } from "@/services/vercel-service";
+import { requireAuth } from "@/lib/api-auth";
 
 type RouteParams = { params: Promise<{ projectId: string }> };
 
@@ -12,6 +13,9 @@ export async function GET(
   req: NextRequest,
   { params }: RouteParams
 ): Promise<NextResponse> {
+  const authError = await requireAuth(req);
+  if (authError) return authError;
+
   const { projectId } = await params;
 
   // Token resolution priority: .env -> cookie -> Authorization header

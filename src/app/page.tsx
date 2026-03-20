@@ -435,8 +435,8 @@ export default function Home() {
               </span>
             </div>
 
-            {/* Sync Vercel - only show if connected */}
-            {isVercelConnected && (
+            {/* Sync Vercel - only show if connected AND logged in */}
+            {isVercelConnected && user && (
               <button
                 onClick={syncVercelProjects}
                 disabled={isSyncing}

@@ -3,12 +3,16 @@ import {
   createServerVercelClient,
   resolveVercelToken,
 } from "@/services/vercel-service";
+import { requireAuth } from "@/lib/api-auth";
 
 // ─── GET /api/vercel ─────────────────────────────────────────────────────────
 // Proxy lấy tất cả Vercel projects của user (kể cả team projects).
 // Token resolve theo thứ tự: cookie `vercel_token` → Authorization header → env MY_VERCEL_TOKEN
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
+  const authError = await requireAuth(req);
+  if (authError) return authError;
+
   // Token resolution priority:
   // 1. .env MY_VERCEL_TOKEN (server-side, highest priority)
   // 2. Cookie vercel_token (client-side fallback)
