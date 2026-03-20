@@ -108,6 +108,20 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
                 )}
               </span>
             )}
+            {project.isPrivate && (
+              <span
+                style={{
+                  padding: "2px 6px",
+                  background: "#1a1a1a",
+                  border: "1px solid #252525",
+                  color: "#f59e0b",
+                  fontSize: 10,
+                }}
+                title="Private project"
+              >
+                private
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-1">
             {project.platforms.map((p) => (

@@ -32,9 +32,15 @@ export default function Home() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const { user } = useAuth();
 
-  // Filter projects based on category and tag
+  // Filter out private projects for guests
+  const visibleProjects = useMemo(() => {
+    if (user) return projects; // Logged in users see all projects
+    return projects.filter((p) => !p.isPrivate); // Guests only see public projects
+  }, [projects, user]);
+
+  // Filter projects based on category and tag (applied to visible projects)
   const filteredProjects = useMemo(() => {
-    return projects.filter((project: Project) => {
+    return visibleProjects.filter((project: Project) => {
       // Category filter
       if (activeCategory && project.category !== activeCategory) {
         return false;
@@ -53,7 +59,7 @@ export default function Home() {
 
       return true;
     });
-  }, [projects, activeCategory, activeTag]);
+  }, [visibleProjects, activeCategory, activeTag]);
 
   const getTitle = () => {
     if (activeCategory) {
@@ -239,14 +245,14 @@ export default function Home() {
     }
   }, []);
 
-  // Compute category counts
+  // Compute category counts based on visible projects
   const categoryCounts = useMemo(() => {
     const counts = new Map<string, number>();
-    projects.forEach((project) => {
+    visibleProjects.forEach((project) => {
       counts.set(project.category, (counts.get(project.category) || 0) + 1);
     });
     return [
-      { key: "all", label: "all", count: projects.length },
+      { key: "all", label: "all", count: visibleProjects.length },
       { key: "active", label: "active", count: counts.get("active") || 0 },
       {
         key: "learning",
@@ -260,7 +266,7 @@ export default function Home() {
       },
       { key: "archive", label: "archive", count: counts.get("archive") || 0 },
     ];
-  }, [projects]);
+  }, [visibleProjects]);
 
   return (
     <div style={{ display: "flex", height: "100vh", background: "#0c0c0c" }}>
@@ -466,13 +472,13 @@ export default function Home() {
         </div>
 
         {/* Stats Row */}
-        <StatsRow projects={projects} />
+        <StatsRow projects={visibleProjects} />
 
         {/* Filter Tags */}
         <FilterTags
           onTagChange={handleTagChange}
           activeTag={activeTag}
-          projects={projects}
+          projects={visibleProjects}
         />
 
         {/* Project Cards Grid */}
