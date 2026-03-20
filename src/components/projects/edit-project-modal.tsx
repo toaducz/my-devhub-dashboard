@@ -26,7 +26,7 @@ export default function EditProjectModal({
     platforms: project.platforms as ProjectPlatform[],
     techStack: project.techStack,
     isLive: project.isLive,
-    isPrivate: false,
+    isPrivate: project.isPrivate,
   });
 
   const [newTechStack, setNewTechStack] = useState("");
@@ -75,6 +75,7 @@ export default function EditProjectModal({
         platforms: formData.platforms,
         techStack: formData.techStack,
         isLive: formData.isLive,
+        isPrivate: formData.isPrivate,
       };
 
       onUpdate(updated);
@@ -98,7 +99,10 @@ export default function EditProjectModal({
   const addTechStack = () => {
     const tech = newTechStack.trim();
     if (tech && !formData.techStack.includes(tech)) {
-      setFormData((prev) => ({ ...prev, techStack: [...prev.techStack, tech] }));
+      setFormData((prev) => ({
+        ...prev,
+        techStack: [...prev.techStack, tech],
+      }));
       setNewTechStack("");
     }
   };
@@ -159,7 +163,14 @@ export default function EditProjectModal({
             borderBottom: "1px solid #1f1f1f",
           }}
         >
-          <h2 style={{ margin: 0, color: "#e5e5e5", fontSize: 16, fontWeight: 600 }}>
+          <h2
+            style={{
+              margin: 0,
+              color: "#e5e5e5",
+              fontSize: 16,
+              fontWeight: 600,
+            }}
+          >
             edit_project
           </h2>
           <button
@@ -182,14 +193,23 @@ export default function EditProjectModal({
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {/* Name */}
             <div>
-              <label style={{ color: "#e5e5e5", fontSize: 12, marginBottom: 4, display: "block" }}>
+              <label
+                style={{
+                  color: "#e5e5e5",
+                  fontSize: 12,
+                  marginBottom: 4,
+                  display: "block",
+                }}
+              >
                 project_name *
               </label>
               <input
                 type="text"
                 required
                 value={formData.name}
-                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 style={inputStyle}
                 placeholder="my-awesome-project"
               />
@@ -197,12 +217,24 @@ export default function EditProjectModal({
 
             {/* Description */}
             <div>
-              <label style={{ color: "#e5e5e5", fontSize: 12, marginBottom: 4, display: "block" }}>
+              <label
+                style={{
+                  color: "#e5e5e5",
+                  fontSize: 12,
+                  marginBottom: 4,
+                  display: "block",
+                }}
+              >
                 description
               </label>
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 style={{ ...inputStyle, minHeight: 60, resize: "vertical" }}
                 placeholder="// Brief description of your project"
               />
@@ -210,14 +242,23 @@ export default function EditProjectModal({
 
             {/* URL */}
             <div>
-              <label style={{ color: "#e5e5e5", fontSize: 12, marginBottom: 4, display: "block" }}>
+              <label
+                style={{
+                  color: "#e5e5e5",
+                  fontSize: 12,
+                  marginBottom: 4,
+                  display: "block",
+                }}
+              >
                 url *
               </label>
               <input
                 type="text"
                 required
                 value={formData.url}
-                onChange={(e) => setFormData((prev) => ({ ...prev, url: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, url: e.target.value }))
+                }
                 style={inputStyle}
                 placeholder="myproject.com"
               />
@@ -225,13 +266,23 @@ export default function EditProjectModal({
 
             {/* Category */}
             <div>
-              <label style={{ color: "#e5e5e5", fontSize: 12, marginBottom: 4, display: "block" }}>
+              <label
+                style={{
+                  color: "#e5e5e5",
+                  fontSize: 12,
+                  marginBottom: 4,
+                  display: "block",
+                }}
+              >
                 category
               </label>
               <select
                 value={formData.category}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, category: e.target.value as CategoryType }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    category: e.target.value as CategoryType,
+                  }))
                 }
                 style={inputStyle}
               >
@@ -244,13 +295,22 @@ export default function EditProjectModal({
 
             {/* Platforms */}
             <div>
-              <label style={{ color: "#e5e5e5", fontSize: 12, marginBottom: 4, display: "block" }}>
+              <label
+                style={{
+                  color: "#e5e5e5",
+                  fontSize: 12,
+                  marginBottom: 4,
+                  display: "block",
+                }}
+              >
                 platforms
               </label>
               <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                 <select
                   value={newPlatform}
-                  onChange={(e) => setNewPlatform(e.target.value as ProjectPlatform)}
+                  onChange={(e) =>
+                    setNewPlatform(e.target.value as ProjectPlatform)
+                  }
                   style={{ ...inputStyle, flex: 1 }}
                 >
                   <option value="Vercel">Vercel</option>
@@ -264,13 +324,19 @@ export default function EditProjectModal({
                   disabled={formData.platforms.includes(newPlatform)}
                   style={{
                     padding: "8px 16px",
-                    background: formData.platforms.includes(newPlatform) ? "#1f1f1f" : "#22c55e",
+                    background: formData.platforms.includes(newPlatform)
+                      ? "#1f1f1f"
+                      : "#22c55e",
                     border: "none",
-                    color: formData.platforms.includes(newPlatform) ? "#525252" : "#0c0c0c",
+                    color: formData.platforms.includes(newPlatform)
+                      ? "#525252"
+                      : "#0c0c0c",
                     fontSize: 12,
                     fontWeight: 600,
                     fontFamily: "inherit",
-                    cursor: formData.platforms.includes(newPlatform) ? "not-allowed" : "pointer",
+                    cursor: formData.platforms.includes(newPlatform)
+                      ? "not-allowed"
+                      : "pointer",
                     borderRadius: 4,
                   }}
                 >
@@ -297,7 +363,14 @@ export default function EditProjectModal({
                     <button
                       type="button"
                       onClick={() => togglePlatform(p)}
-                      style={{ background: "none", border: "none", color: "#737373", cursor: "pointer", padding: 0, fontSize: 12 }}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#737373",
+                        cursor: "pointer",
+                        padding: 0,
+                        fontSize: 12,
+                      }}
                     >
                       ×
                     </button>
@@ -308,7 +381,14 @@ export default function EditProjectModal({
 
             {/* Tech Stack */}
             <div>
-              <label style={{ color: "#e5e5e5", fontSize: 12, marginBottom: 4, display: "block" }}>
+              <label
+                style={{
+                  color: "#e5e5e5",
+                  fontSize: 12,
+                  marginBottom: 4,
+                  display: "block",
+                }}
+              >
                 tech_stack
               </label>
               <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
@@ -317,7 +397,10 @@ export default function EditProjectModal({
                   value={newTechStack}
                   onChange={(e) => setNewTechStack(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") { e.preventDefault(); addTechStack(); }
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addTechStack();
+                    }
                   }}
                   style={{ ...inputStyle, flex: 1 }}
                   placeholder="NextJS, Go, Rust..."
@@ -361,7 +444,14 @@ export default function EditProjectModal({
                     <button
                       type="button"
                       onClick={() => removeTechStack(tech)}
-                      style={{ background: "none", border: "none", color: "#3b82f6", cursor: "pointer", padding: 0, fontSize: 12 }}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#3b82f6",
+                        cursor: "pointer",
+                        padding: 0,
+                        fontSize: 12,
+                      }}
                     >
                       ×
                     </button>
@@ -372,20 +462,48 @@ export default function EditProjectModal({
 
             {/* Checkboxes */}
             <div style={{ display: "flex", gap: 16 }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 8, color: "#e5e5e5", fontSize: 12, cursor: "pointer" }}>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  color: "#e5e5e5",
+                  fontSize: 12,
+                  cursor: "pointer",
+                }}
+              >
                 <input
                   type="checkbox"
                   checked={formData.isLive}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, isLive: e.target.checked }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isLive: e.target.checked,
+                    }))
+                  }
                   style={{ width: 14, height: 14 }}
                 />
                 live
               </label>
-              <label style={{ display: "flex", alignItems: "center", gap: 8, color: "#e5e5e5", fontSize: 12, cursor: "pointer" }}>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  color: "#e5e5e5",
+                  fontSize: 12,
+                  cursor: "pointer",
+                }}
+              >
                 <input
                   type="checkbox"
                   checked={formData.isPrivate}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, isPrivate: e.target.checked }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isPrivate: e.target.checked,
+                    }))
+                  }
                   style={{ width: 14, height: 14 }}
                 />
                 private
@@ -401,7 +519,14 @@ export default function EditProjectModal({
           </div>
 
           {/* Actions */}
-          <div style={{ display: "flex", gap: 8, marginTop: 24, justifyContent: "flex-end" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              marginTop: 24,
+              justifyContent: "flex-end",
+            }}
+          >
             <button
               type="button"
               onClick={onClose}
@@ -420,7 +545,9 @@ export default function EditProjectModal({
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || !formData.name.trim() || !formData.url.trim()}
+              disabled={
+                isSubmitting || !formData.name.trim() || !formData.url.trim()
+              }
               style={{
                 padding: "8px 16px",
                 background:

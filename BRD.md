@@ -160,6 +160,14 @@ interface Project {
 ### 6.3 UI Components
 
 - **ProjectCard:** Clickable card với hover effect, hiển thị đầy đủ thông tin
+  - **Card Color Logic:**
+    - Nếu `status === "offline"` → border và status indicator màu đỏ (`#ef4444`)
+    - Nếu `status === "online"` → màu dựa trên `category`:
+      - `active` → xanh lá (`#22c55e`)
+      - `learning` → vàng cam (`#f59e0b`)
+      - `research` → xanh dương (`#3b82f6`)
+      - `archive` → cam đậm (`#ea580c`)
+  - URL link ở footer hiển thị màu đỏ khi offline, xám khi online
 - **Sidebar:** Navigation và category filter
 - **FilterTags:** Dynamic tag filtering
 - **StatsRow:** Statistics overview

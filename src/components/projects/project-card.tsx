@@ -1,14 +1,18 @@
-import type { Project, ProjectStatus } from "@/types/project";
+import type { Project } from "@/types/project";
 
-const STATUS_CONFIG: Record<
-  ProjectStatus,
-  { color: string; label: string; borderColor: string }
-> = {
-  online: { color: "#22c55e", label: "online", borderColor: "#22c55e" },
-  offline: { color: "#ef4444", label: "offline", borderColor: "#ef4444" },
-  learning: { color: "#f59e0b", label: "learning", borderColor: "#f59e0b" },
-  research: { color: "#3b82f6", label: "research", borderColor: "#3b82f6" },
-  archive: { color: "#525252", label: "archive", borderColor: "#1f1f1f" },
+const CATEGORY_COLORS = {
+  active: { color: "#22c55e", borderColor: "#22c55e" },
+  learning: { color: "#f59e0b", borderColor: "#f59e0b" },
+  research: { color: "#3b82f6", borderColor: "#3b82f6" },
+  archive: { color: "#ea580c", borderColor: "#ea580c" },
+} as const;
+
+const STATUS_LABELS: Record<string, string> = {
+  online: "online",
+  offline: "offline",
+  learning: "learning",
+  research: "research",
+  archive: "archive",
 };
 
 const HEALTH_CONFIG = {
@@ -23,7 +27,15 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
-  const status = STATUS_CONFIG[project.status];
+  // Determine card color based on status and category
+  // If offline → red, if online → category-based color
+  const isOffline = project.status === "offline";
+  const categoryColor = CATEGORY_COLORS[project.category];
+
+  const cardColor = isOffline ? "#ef4444" : categoryColor.color;
+  const borderColor = isOffline ? "#ef4444" : categoryColor.borderColor;
+  const statusLabel = STATUS_LABELS[project.status];
+
   const projectUrl = project.url.startsWith("http")
     ? project.url
     : `https://${project.url}`;
@@ -44,7 +56,7 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
         style={{
           padding: 16,
           background: "#171717",
-          border: `1px solid ${status.borderColor}`,
+          border: `1px solid ${borderColor}`,
           minWidth: 0,
           transition: "border-color 0.2s, background 0.2s",
           cursor: "pointer",
@@ -64,12 +76,12 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
                 width: 8,
                 height: 8,
                 borderRadius: "50%",
-                background: status.color,
+                background: cardColor,
                 flexShrink: 0,
               }}
             />
-            <span style={{ color: status.color, fontSize: 11 }}>
-              {status.label}
+            <span style={{ color: cardColor, fontSize: 11 }}>
+              {statusLabel}
             </span>
             {project.health && (
               <span
@@ -127,7 +139,11 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
             )}
             {onEdit && (
               <button
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEdit(project); }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onEdit(project);
+                }}
                 title="Edit project"
                 style={{
                   background: "none",

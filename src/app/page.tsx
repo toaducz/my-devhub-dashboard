@@ -140,6 +140,7 @@ export default function Home() {
       techStack: dbProject.tech_stack,
       url: dbProject.url,
       category: dbProject.category,
+      isPrivate: dbProject.is_private,
       isVercelSynced: !!dbProject.vercel_project_id,
       vercel_project_id: dbProject.vercel_project_id || undefined,
       health: dbProject.last_health_check

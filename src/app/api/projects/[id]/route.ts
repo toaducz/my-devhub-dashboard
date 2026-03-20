@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { z } from "zod";
-import {
-  getProjectById,
-  updateProject,
-  deleteProject,
-} from "@/services/project-service";
+import { getServerClient } from "@/lib/supabase";
+import { ProjectRepository } from "@/lib/project-repository";
+import { getProjectById } from "@/services/project-service";
 
 // ─── Zod schema ──────────────────────────────────────────────────────────────
 
@@ -66,9 +65,27 @@ export async function PUT(
       );
     }
 
-    const updated = await updateProject(id, parsed.data);
-    // updateProject returns null (fire-and-forget style), treat success as ok
-    void updated;
+    // Dùng server client có cookies để auth.uid() khớp với user_id → RLS pass
+    const cookieStore = await cookies();
+    const supabase = getServerClient(cookieStore);
+    const repo = new ProjectRepository(supabase);
+
+    // Map camelCase → snake_case
+    const { name, description, url, category, platforms, techStack, isLive, isPrivate, vercelProjectId, healthStatus, lastHealthCheck } = parsed.data;
+    const dbUpdates: Record<string, unknown> = {};
+    if (name !== undefined) dbUpdates.name = name;
+    if (description !== undefined) dbUpdates.description = description;
+    if (url !== undefined) dbUpdates.url = url;
+    if (category !== undefined) dbUpdates.category = category;
+    if (platforms !== undefined) dbUpdates.platforms = platforms;
+    if (techStack !== undefined) dbUpdates.tech_stack = techStack;
+    if (isLive !== undefined) dbUpdates.is_live = isLive;
+    if (isPrivate !== undefined) dbUpdates.is_private = isPrivate;
+    if (vercelProjectId !== undefined) dbUpdates.vercel_project_id = vercelProjectId;
+    if (healthStatus !== undefined) dbUpdates.health_status = healthStatus;
+    if (lastHealthCheck !== undefined) dbUpdates.last_health_check = lastHealthCheck;
+
+    await repo.updateProject(id, dbUpdates);
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err: unknown) {
     console.error(`[PUT /api/projects/${id}]`, err);
@@ -87,7 +104,11 @@ export async function DELETE(
 ): Promise<NextResponse> {
   const { id } = await params;
   try {
-    await deleteProject(id);
+    const cookieStore = await cookies();
+    const supabase = getServerClient(cookieStore);
+    const repo = new ProjectRepository(supabase);
+
+    await repo.deleteProject(id);
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err: unknown) {
     console.error(`[DELETE /api/projects/${id}]`, err);

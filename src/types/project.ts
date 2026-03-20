@@ -17,6 +17,7 @@ export interface Project {
   techStack: string[];
   url: string;
   category: "active" | "learning" | "research" | "archive";
+  isPrivate: boolean;
   isVercelSynced?: boolean;
   vercel_project_id?: string | null;
   health?: {
