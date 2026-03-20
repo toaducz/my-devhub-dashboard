@@ -119,12 +119,11 @@ export class ProjectRepository {
     this.supabase = supabase || supabaseClient;
   }
 
-  // Fetch all projects (non-private only for public view)
+  // Fetch all projects (bao gồm cả private)
   async fetchAllProjects(): Promise<Project[]> {
     const { data, error } = await this.supabase
       .from("projects")
       .select("*")
-      .eq("is_private", false)
       .order("created_at", { ascending: false });
 
     if (error) {

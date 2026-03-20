@@ -5,7 +5,7 @@ import { createServerClient } from "@supabase/ssr";
 // Các route public không cần đăng nhập
 const PUBLIC_ROUTES = [
   "/login",
-  "/api/health", // health check API (được gọi từ server)
+  "/api/", // API routes tự xử lý auth nội bộ
 ];
 
 function isPublic(path: string): boolean {
