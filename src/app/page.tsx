@@ -21,6 +21,9 @@ type CategoryFilter = "active" | "learning" | "research" | "archive" | null;
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>(null);
   const [activeTag, setActiveTag] = useState<string>("all");
+  const [privacyFilter, setPrivacyFilter] = useState<
+    "all" | "public" | "private"
+  >("all");
   const [projects, setProjects] = useState<Project[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
@@ -34,13 +37,15 @@ export default function Home() {
 
   // Filter out private projects for guests
   const visibleProjects = useMemo(() => {
-    if (user) return projects; // Logged in users see all projects
+    if (user) return projects; // Logged in users see all projects by default (will apply privacyFilter later)
     return projects.filter((p) => !p.isPrivate); // Guests only see public projects
   }, [projects, user]);
 
-  // Filter projects based on category and tag (applied to visible projects)
+  // Filter projects based on category, tag, and privacy (applied to visible projects)
   const filteredProjects = useMemo(() => {
-    return visibleProjects.filter((project: Project) => {
+    const base = user ? projects : visibleProjects; // When logged in, start with all projects to apply privacy filter
+
+    return base.filter((project: Project) => {
       // Category filter
       if (activeCategory && project.category !== activeCategory) {
         return false;
@@ -57,9 +62,22 @@ export default function Home() {
         }
       }
 
+      // Privacy filter (only for logged in users)
+      if (user && privacyFilter !== "all") {
+        if (privacyFilter === "private" && !project.isPrivate) return false;
+        if (privacyFilter === "public" && project.isPrivate) return false;
+      }
+
       return true;
     });
-  }, [visibleProjects, activeCategory, activeTag]);
+  }, [
+    projects,
+    visibleProjects,
+    user,
+    activeCategory,
+    activeTag,
+    privacyFilter,
+  ]);
 
   const getTitle = () => {
     if (activeCategory) {
@@ -79,6 +97,10 @@ export default function Home() {
   const handleTagChange = (tag: string) => {
     setActiveTag(tag);
     setActiveCategory(null); // Reset category filter when tag changes
+  };
+
+  const handlePrivacyFilterChange = (filter: "all" | "public" | "private") => {
+    setPrivacyFilter(filter);
   };
 
   const handleAddProject = (newProject: Project) => {
@@ -347,6 +369,43 @@ export default function Home() {
 
           {/* Actions */}
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {/* Privacy Filter - only show when logged in */}
+            {user && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 12px",
+                  background: "#171717",
+                  border: "1px solid #1f1f1f",
+                }}
+              >
+                <span style={{ color: "#525252", fontSize: 12 }}>privacy:</span>
+                {(["all", "public", "private"] as const).map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => handlePrivacyFilterChange(filter)}
+                    style={{
+                      padding: "4px 10px",
+                      background:
+                        privacyFilter === filter ? "#22c55e" : "#1a1a1a",
+                      border:
+                        privacyFilter === filter ? "none" : "1px solid #252525",
+                      color: privacyFilter === filter ? "#0c0c0c" : "#737373",
+                      fontSize: 11,
+                      fontWeight: privacyFilter === filter ? 600 : 400,
+                      fontFamily: "inherit",
+                      cursor: "pointer",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {filter === "all" ? "all" : filter}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {/* Search */}
             <div
               style={{
