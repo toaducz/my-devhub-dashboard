@@ -15,7 +15,7 @@ export async function GET(
   const { projectId } = await params;
 
   // Token resolution priority: .env -> cookie -> Authorization header
-  const envToken = process.env.VERCEL_API_TOKEN;
+  const envToken = process.env.MY_VERCEL_TOKEN;
   const cookieToken = req.cookies.get("vercel_token")?.value;
   const authHeader = req.headers.get("Authorization");
 
@@ -25,7 +25,7 @@ export async function GET(
     return NextResponse.json(
       {
         error:
-          "Vercel token required. Configure VERCEL_API_TOKEN in .env, set cookie, or pass Authorization header.",
+          "Vercel token required. Configure MY_VERCEL_TOKEN in .env, set cookie, or pass Authorization header.",
       },
       { status: 401 }
     );

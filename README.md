@@ -53,7 +53,7 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 # Optional: Vercel API Token for auto-sync
-VERCEL_API_TOKEN=your_vercel_api_token
+MY_VERCEL_TOKEN=your_MY_VERCEL_TOKEN
 ```
 
 **Note**: The app works in mock mode without Supabase credentials. All data is stored in-memory and will reset on page refresh.

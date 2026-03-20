@@ -6,14 +6,14 @@ import {
 
 // ─── GET /api/vercel ─────────────────────────────────────────────────────────
 // Proxy lấy tất cả Vercel projects của user (kể cả team projects).
-// Token resolve theo thứ tự: cookie `vercel_token` → Authorization header → env VERCEL_API_TOKEN
+// Token resolve theo thứ tự: cookie `vercel_token` → Authorization header → env MY_VERCEL_TOKEN
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   // Token resolution priority:
-  // 1. .env VERCEL_API_TOKEN (server-side, highest priority)
+  // 1. .env MY_VERCEL_TOKEN (server-side, highest priority)
   // 2. Cookie vercel_token (client-side fallback)
   // 3. Authorization header (for explicit passing)
-  const envToken = process.env.VERCEL_API_TOKEN;
+  const envToken = process.env.MY_VERCEL_TOKEN;
   const cookieToken = req.cookies.get("vercel_token")?.value;
   const authHeader = req.headers.get("Authorization");
 
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json(
       {
         error:
-          "Vercel token required. Configure VERCEL_API_TOKEN in .env, or set cookie `vercel_token`, or pass via `Authorization: Bearer <token>` header.",
+          "Vercel token required. Configure MY_VERCEL_TOKEN in .env, or set cookie `vercel_token`, or pass via `Authorization: Bearer <token>` header.",
       },
       { status: 401 }
     );

@@ -55,7 +55,7 @@ export default function SettingsPage() {
   const { toasts, show: showToast } = useToast();
   const { user, signOut, isMock } = useAuth();
 
-  // Check if VERCEL_API_TOKEN is configured in .env (server-side)
+  // Check if MY_VERCEL_TOKEN is configured in .env (server-side)
   useEffect(() => {
     const checkEnvToken = async () => {
       try {
@@ -555,8 +555,8 @@ export default function SettingsPage() {
                   }}
                 >
                   Vercel token được cấu hình từ environment variable
-                  (VERCEL_API_TOKEN). Token từ .env có priority cao nhất và
-                  không cần lưu vào cookie.
+                  (MY_VERCEL_TOKEN). Token từ .env có priority cao nhất và không
+                  cần lưu vào cookie.
                   {isConnected && (
                     <div
                       style={{

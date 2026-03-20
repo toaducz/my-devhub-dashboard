@@ -18,7 +18,7 @@ Xây dựng một Dashboard cá nhân giúp quản lý tập trung các dự án
 - **Backend/Database:** Supabase (PostgreSQL, Auth, Realtime) - _Optional, hỗ trợ chế độ mock để phát triển_.
   - **Config:** `NEXT_PUBLIC_SUPABASE_URL` và `NEXT_PUBLIC_SUPABASE_ANON_KEY` từ `.env`
 - **Integrations:** Vercel API (để fetch dữ liệu tự động).
-  - **Config:** `VERCEL_API_TOKEN` từ `.env` (ưu tiên), fallback to cookie `vercel_token`, cuối cùng mới nhập tay qua UI
+  - **Config:** `MY_VERCEL_TOKEN` từ `.env` (ưu tiên), fallback to cookie `vercel_token`, cuối cùng mới nhập tay qua UI
 
 ## 3. Tính năng chính (Key Features)
 
@@ -34,7 +34,7 @@ Xây dựng một Dashboard cá nhân giúp quản lý tập trung các dự án
 - Hiển thị trạng thái sync và thời gian đồng bộ cuối cùng.
 - Xử lý lỗi và hiển thị thông báo khi sync thất bại.
 - **Token Resolution Priority:** Tự động kiểm tra Vercel token theo thứ tự ưu tiên:
-  1. **`.env` file** (`VERCEL_API_TOKEN`) - Server-side, highest priority
+  1. **`.env` file** (`MY_VERCEL_TOKEN`) - Server-side, highest priority
   2. **Cookie** (`vercel_token`) - Client-side fallback
   3. **Manual input** - UI form trong Settings page (lưu vào cookie)
   - Nếu không có token nào: Chỉ hiển thị custom projects, hoạt động bình thường.
@@ -123,12 +123,12 @@ interface Project {
 
 ### 6.1 Vercel API Integration
 
-- **Config:** `VERCEL_API_TOKEN` từ `.env` (ví dụ: `vcp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx`)
+- **Config:** `MY_VERCEL_TOKEN` từ `.env` (ví dụ: `vcp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx`)
 - **Token Resolution:** Server-side ưu tiên `.env` → Authorization header → fallback. Client-side dùng cookie `vercel_token`.
 - File: `src/lib/vercel-api.ts` (client-side) và `src/services/vercel-service.ts` (server-side)
 - **Server-side (`vercel-service.ts`):**
   - `createServerVercelClient(token)` - Tạo client với token cụ thể
-  - `resolveVercelToken(authHeader)` - Lấy token theo thứ tự: Authorization header → `VERCEL_API_TOKEN` từ env
+  - `resolveVercelToken(authHeader)` - Lấy token theo thứ tự: Authorization header → `MY_VERCEL_TOKEN` từ env
 - **Client-side (`vercel-api.ts`):**
   - Singleton `VercelAPI` class với các methods:
     - `getProjects()` - Lấy tất cả projects từ user và teams
@@ -140,7 +140,7 @@ interface Project {
     - `setToken(token)` - Lưu token vào cookie (30 ngày)
     - `clearToken()` - Xóa token khỏi cookie
 - Helper function `transformVercelProject()` - Chuyển đổi Vercel data sang internal format
-- **API Routes:** `/api/vercel` - Proxy server-side với token resolution: cookie `vercel_token` → Authorization header → `VERCEL_API_TOKEN` env
+- **API Routes:** `/api/vercel` - Proxy server-side với token resolution: cookie `vercel_token` → Authorization header → `MY_VERCEL_TOKEN` env
 
 ### 6.2 Sync Mechanism
 
@@ -189,7 +189,7 @@ Dựa trên sự có mặt của Vercel token theo thứ tự ưu tiên:
 
 **Token Resolution Priority:**
 
-1. **Server-side `.env`** (`VERCEL_API_TOKEN`) - Highest priority, luôn có sẵn trên server
+1. **Server-side `.env`** (`MY_VERCEL_TOKEN`) - Highest priority, luôn có sẵn trên server
 2. **Client-side cookie** (`vercel_token`) - Fallback khi server không có
 3. **Manual input** - User nhập qua Settings UI, lưu vào cookie
 

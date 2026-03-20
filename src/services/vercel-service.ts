@@ -145,7 +145,7 @@ export function createServerVercelClient(token: string) {
 /**
  * Lấy Vercel token ưu tiên theo thứ tự:
  * 1. Authorization header từ request
- * 2. Biến môi trường VERCEL_API_TOKEN (server-only)
+ * 2. Biến môi trường MY_VERCEL_TOKEN (server-only)
  */
 export function resolveVercelToken(
   authorizationHeader: string | null
@@ -153,5 +153,5 @@ export function resolveVercelToken(
   if (authorizationHeader?.startsWith("Bearer ")) {
     return authorizationHeader.slice(7);
   }
-  return process.env.VERCEL_API_TOKEN ?? null;
+  return process.env.MY_VERCEL_TOKEN ?? null;
 }
