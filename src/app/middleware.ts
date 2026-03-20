@@ -2,56 +2,40 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-// Public routes that don't require authentication
+// Các route public không cần đăng nhập
 const PUBLIC_ROUTES = [
   "/login",
-  "/health",
-  "/api/health",
-  "/",
-  "/api/projects",
+  "/api/health", // health check API (được gọi từ server)
 ];
 
-// API routes that require auth (checked separately)
-const PROTECTED_API_ROUTES = [
-  "/api/vercel",
-  "/api/projects/update",
-  "/api/projects/delete",
-];
-
-// Page routes that require auth (admin-only)
-const PROTECTED_ROUTES = ["/settings", "/tags"];
-
-function isMatch(path: string, routes: string[]): boolean {
-  return routes.some((r) => path === r || path.startsWith(r + "/"));
+function isPublic(path: string): boolean {
+  return PUBLIC_ROUTES.some((r) => path === r || path.startsWith(r + "/"));
 }
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
 
-  // Always allow public routes
-  if (isMatch(pathname, PUBLIC_ROUTES)) {
+  // Luôn cho qua các route public
+  if (isPublic(pathname)) {
     return NextResponse.next();
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // Mock mode: no Supabase configured → allow everything
+  // Mock mode: không có Supabase → cho qua hết
   if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.next();
   }
 
-  // Build a response we can mutate (to set/refresh cookies)
   const response = NextResponse.next({ request });
 
-  // ── Use @supabase/ssr so it reads cookies from the request ──────────────
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
       },
       setAll(toSet) {
-        // Set in both the forwarded request and the outgoing response
         toSet.forEach(({ name, value, options }) => {
           request.cookies.set(name, value);
           response.cookies.set(name, value, options);
@@ -60,23 +44,19 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     },
   });
 
-  // getUser() is more reliable than getSession() in middleware
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthenticated = !!user;
-
-  // Protected page routes → redirect to login
-  if (isMatch(pathname, PROTECTED_ROUTES) && !isAuthenticated) {
+  if (!user) {
+    // API routes → 401
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    // Page routes → redirect to /login
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect_to", pathname);
     return NextResponse.redirect(loginUrl);
-  }
-
-  // Protected API routes → 401 JSON
-  if (isMatch(pathname, PROTECTED_API_ROUTES) && !isAuthenticated) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   return response;
@@ -84,7 +64,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and static files
+    // Bỏ qua static files và Next.js internals
     "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };
+
