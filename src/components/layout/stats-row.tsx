@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useAuth } from "@/lib/contexts";
 import type { Project } from "@/types/project";
 
 interface StatsRowProps {
@@ -8,6 +9,8 @@ interface StatsRowProps {
 }
 
 export default function StatsRow({ projects = [] }: StatsRowProps) {
+  const { user } = useAuth();
+
   const stats = useMemo(() => {
     const online = projects.filter((p) => p.status === "online").length;
     const offline = projects.filter((p) => p.status === "offline").length;
@@ -20,8 +23,16 @@ export default function StatsRow({ projects = [] }: StatsRowProps) {
   const STAT_ITEMS = [
     { label: "online", count: stats.online, color: "#22c55e" },
     { label: "offline", count: stats.offline, color: "#ef4444" },
-    { label: "unchecked", count: stats.unchecked, color: "#f59e0b" },
-    { label: "vercel_synced", count: stats.vercelSynced, color: "#a3a3a3" },
+    ...(user
+      ? [
+          { label: "unchecked", count: stats.unchecked, color: "#f59e0b" },
+          {
+            label: "vercel_synced",
+            count: stats.vercelSynced,
+            color: "#a3a3a3",
+          },
+        ]
+      : []),
   ];
 
   return (

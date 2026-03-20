@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/lib/contexts";
 
-const NAV_ITEMS = [
+const PUBLIC_NAV_ITEMS = [
   { href: "/", label: "all_projects", icon: "⊞" },
-  { href: "/health", label: "health_check", icon: "◈" },
   { href: "/tags", label: "tags", icon: "#" },
+];
+
+const PRIVATE_NAV_ITEMS = [
+  { href: "/health", label: "health_check", icon: "◈" },
   { href: "/settings", label: "settings", icon: "⚙" },
 ];
 
@@ -34,6 +38,7 @@ export default function Sidebar({
   ],
 }: SidebarProps) {
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const handleCategoryClick = (category: string) => {
     if (onCategoryChange) {
@@ -70,7 +75,7 @@ export default function Sidebar({
         <span style={{ color: "#525252", fontSize: 11, marginBottom: 4 }}>
           navigation
         </span>
-        {NAV_ITEMS.map((item) => {
+        {PUBLIC_NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -101,6 +106,38 @@ export default function Sidebar({
             </Link>
           );
         })}
+        {user &&
+          PRIVATE_NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex items-center gap-2 transition-colors"
+                style={{
+                  padding: "8px 12px",
+                  background: isActive ? "#1a1a1a" : "transparent",
+                  color: isActive ? "#e5e5e5" : "#737373",
+                  fontSize: 13,
+                  fontWeight: isActive ? 500 : 400,
+                  textDecoration: "none",
+                  borderRadius: 0,
+                }}
+              >
+                <span
+                  style={{
+                    width: 14,
+                    fontSize: 13,
+                    color: isActive ? "#22c55e" : "#525252",
+                    fontFamily: "monospace",
+                  }}
+                >
+                  {isActive ? ">" : item.icon}
+                </span>
+                {item.label}
+              </Link>
+            );
+          })}
       </nav>
 
       {/* Categories */}
