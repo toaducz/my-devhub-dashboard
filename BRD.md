@@ -164,7 +164,7 @@ interface Project {
     - Nếu `status === "offline"` → border và status indicator màu đỏ (`#ef4444`)
     - Nếu `status === "online"` → màu dựa trên `category`:
       - `active` → xanh lá (`#22c55e`)
-      - `learning` → vàng cam (`#f59e0b`)
+      - `learning` → tím (`#8b5cf6`)
       - `research` → xanh dương (`#3b82f6`)
       - `archive` → cam đậm (`#ea580c`)
   - URL link ở footer hiển thị màu đỏ khi offline, xám khi online

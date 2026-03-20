@@ -2,9 +2,9 @@ import type { Project } from "@/types/project";
 
 const CATEGORY_COLORS = {
   active: { color: "#22c55e", borderColor: "#22c55e" },
-  learning: { color: "#f59e0b", borderColor: "#f59e0b" },
+  learning: { color: "#8b5cf6", borderColor: "#8b5cf6" },
   research: { color: "#3b82f6", borderColor: "#3b82f6" },
-  archive: { color: "#ea580c", borderColor: "#ea580c" },
+  archive: { color: "#ff975fff", borderColor: "#ff975f8c" },
 } as const;
 
 const STATUS_LABELS: Record<string, string> = {
