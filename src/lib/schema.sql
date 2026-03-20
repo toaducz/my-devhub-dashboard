@@ -259,6 +259,7 @@ GRANT EXECUTE ON FUNCTION public.update_project_health(UUID, TEXT, TIMESTAMPTZ) 
 
 -- Hàm update các trường của project, bypass RLS.
 -- Chỉ update field nào được truyền vào (không NULL).
+-- Yêu cầu đăng nhập: auth.uid() phải có giá trị.
 CREATE OR REPLACE FUNCTION public.update_project_fields(
   p_id          UUID,
   p_name        TEXT        DEFAULT NULL,
@@ -273,6 +274,11 @@ CREATE OR REPLACE FUNCTION public.update_project_fields(
 )
 RETURNS VOID AS $$
 BEGIN
+  -- Chỉ cho phép user đã đăng nhập gọi hàm này
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
   UPDATE public.projects
   SET
     name        = COALESCE(p_name,        name),

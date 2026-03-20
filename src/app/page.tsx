@@ -14,6 +14,7 @@ import {
 } from "@/lib/project-repository";
 import type { Project, ProjectPlatform } from "@/types/project";
 import { vercelAPI, type VercelProject } from "@/lib/vercel-api";
+import { useAuth } from "@/lib/contexts";
 
 type CategoryFilter = "active" | "learning" | "research" | "archive" | null;
 
@@ -29,6 +30,7 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasEnvToken, setHasEnvToken] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const { user } = useAuth();
 
   // Filter projects based on category and tag
   const filteredProjects = useMemo(() => {
@@ -426,38 +428,40 @@ export default function Home() {
               </button>
             )}
 
-            {/* Add Project */}
-            <button
-              onClick={() => setIsModalOpen(true)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "8px 16px",
-                background: "#22c55e",
-                border: "none",
-                color: "#0c0c0c",
-                fontSize: 12,
-                fontWeight: 600,
-                fontFamily: "inherit",
-                cursor: "pointer",
-                transition: "opacity 0.15s",
-              }}
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#0c0c0c"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {/* Add Project — chỉ hiện khi đã đăng nhập */}
+            {user && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 16px",
+                  background: "#22c55e",
+                  border: "none",
+                  color: "#0c0c0c",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  fontFamily: "inherit",
+                  cursor: "pointer",
+                  transition: "opacity 0.15s",
+                }}
               >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              add_project
-            </button>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#0c0c0c"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                add_project
+              </button>
+            )}
           </div>
         </div>
 
@@ -483,7 +487,7 @@ export default function Home() {
             <ProjectCard
               key={project.id}
               project={project}
-              onEdit={setEditingProject}
+              onEdit={user ? setEditingProject : undefined}
             />
           ))}
         </div>
@@ -502,8 +506,7 @@ export default function Home() {
         )}
       </main>
 
-      {/* Add Project Modal */}
-      {isModalOpen && (
+      {user && isModalOpen && (
         <AddProjectModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -511,7 +514,7 @@ export default function Home() {
         />
       )}
 
-      {editingProject && (
+      {user && editingProject && (
         <EditProjectModal
           isOpen={true}
           project={editingProject}
