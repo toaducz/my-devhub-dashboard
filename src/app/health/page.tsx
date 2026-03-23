@@ -110,9 +110,7 @@ export default function HealthPage() {
     setIsCheckingAll(true);
 
     // Check all projects in parallel
-    const checks = projects.map((project) =>
-      checkProjectHealth(project.id)
-    );
+    const checks = projects.map((project) => checkProjectHealth(project.id));
     const results = await Promise.all(checks);
 
     // Update health data
@@ -132,7 +130,6 @@ export default function HealthPage() {
     },
     [checkProjectHealth]
   );
-
 
   const getStatusColor = (status: HealthStatus) => {
     switch (status) {
@@ -159,7 +156,6 @@ export default function HealthPage() {
         return "unknown";
     }
   };
-
 
   return (
     <div style={{ display: "flex", height: "100vh", background: "#0c0c0c" }}>
@@ -215,30 +211,6 @@ export default function HealthPage() {
             all_projects
           </Link>
           <Link
-            href="/health"
-            className="flex items-center gap-2 transition-colors"
-            style={{
-              padding: "8px 12px",
-              background: pathname === "/health" ? "#1a1a1a" : "transparent",
-              color: pathname === "/health" ? "#e5e5e5" : "#737373",
-              fontSize: 13,
-              fontWeight: pathname === "/health" ? 500 : 400,
-              textDecoration: "none",
-            }}
-          >
-            <span
-              style={{
-                width: 14,
-                fontSize: 13,
-                color: pathname === "/health" ? "#22c55e" : "#525252",
-                fontFamily: "monospace",
-              }}
-            >
-              {pathname === "/health" ? ">" : "◈"}
-            </span>
-            health_check
-          </Link>
-          <Link
             href="/tags"
             className="flex items-center gap-2 transition-colors"
             style={{
@@ -261,6 +233,30 @@ export default function HealthPage() {
               {pathname === "/tags" ? ">" : "#"}
             </span>
             tags
+          </Link>
+          <Link
+            href="/health"
+            className="flex items-center gap-2 transition-colors"
+            style={{
+              padding: "8px 12px",
+              background: pathname === "/health" ? "#1a1a1a" : "transparent",
+              color: pathname === "/health" ? "#e5e5e5" : "#737373",
+              fontSize: 13,
+              fontWeight: pathname === "/health" ? 500 : 400,
+              textDecoration: "none",
+            }}
+          >
+            <span
+              style={{
+                width: 14,
+                fontSize: 13,
+                color: pathname === "/health" ? "#22c55e" : "#525252",
+                fontFamily: "monospace",
+              }}
+            >
+              {pathname === "/health" ? ">" : "◈"}
+            </span>
+            health_check
           </Link>
           <Link
             href="/settings"

@@ -33,6 +33,7 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasEnvToken, setHasEnvToken] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
 
   // Filter out private projects for guests
@@ -68,6 +69,29 @@ export default function Home() {
         if (privacyFilter === "public" && project.isPrivate) return false;
       }
 
+      // Search filter
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase();
+        const matchesName = project.name.toLowerCase().includes(query);
+        const matchesDescription = project.description
+          .toLowerCase()
+          .includes(query);
+        const matchesTechStack = project.techStack.some((tech: string) =>
+          tech.toLowerCase().includes(query)
+        );
+        const matchesPlatforms = project.platforms.some(
+          (platform: ProjectPlatform) => platform.toLowerCase().includes(query)
+        );
+        if (
+          !matchesName &&
+          !matchesDescription &&
+          !matchesTechStack &&
+          !matchesPlatforms
+        ) {
+          return false;
+        }
+      }
+
       return true;
     });
   }, [
@@ -77,6 +101,7 @@ export default function Home() {
     activeCategory,
     activeTag,
     privacyFilter,
+    searchQuery,
   ]);
 
   const getTitle = () => {
@@ -430,9 +455,21 @@ export default function Home() {
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.35-4.35" />
               </svg>
-              <span style={{ color: "#525252", fontSize: 12 }}>
-                search_projects...
-              </span>
+              <input
+                type="text"
+                placeholder="search projects..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  outline: "none",
+                  color: "#525252",
+                  fontSize: 12,
+                  fontFamily: "inherit",
+                  width: "150px",
+                }}
+              />
             </div>
 
             {/* Sync Vercel - only show if connected AND logged in */}

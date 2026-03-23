@@ -286,30 +286,6 @@ export default function SettingsPage() {
               all_projects
             </Link>
             <Link
-              href="/health"
-              className="flex items-center gap-2 transition-colors"
-              style={{
-                padding: "8px 12px",
-                background: pathname === "/health" ? "#1a1a1a" : "transparent",
-                color: pathname === "/health" ? "#e5e5e5" : "#737373",
-                fontSize: 13,
-                fontWeight: pathname === "/health" ? 500 : 400,
-                textDecoration: "none",
-              }}
-            >
-              <span
-                style={{
-                  width: 14,
-                  fontSize: 13,
-                  color: pathname === "/health" ? "#22c55e" : "#525252",
-                  fontFamily: "monospace",
-                }}
-              >
-                {pathname === "/health" ? ">" : "◈"}
-              </span>
-              health_check
-            </Link>
-            <Link
               href="/tags"
               className="flex items-center gap-2 transition-colors"
               style={{
@@ -332,6 +308,30 @@ export default function SettingsPage() {
                 {pathname === "/tags" ? ">" : "#"}
               </span>
               tags
+            </Link>
+            <Link
+              href="/health"
+              className="flex items-center gap-2 transition-colors"
+              style={{
+                padding: "8px 12px",
+                background: pathname === "/health" ? "#1a1a1a" : "transparent",
+                color: pathname === "/health" ? "#e5e5e5" : "#737373",
+                fontSize: 13,
+                fontWeight: pathname === "/health" ? 500 : 400,
+                textDecoration: "none",
+              }}
+            >
+              <span
+                style={{
+                  width: 14,
+                  fontSize: 13,
+                  color: pathname === "/health" ? "#22c55e" : "#525252",
+                  fontFamily: "monospace",
+                }}
+              >
+                {pathname === "/health" ? ">" : "◈"}
+              </span>
+              health_check
             </Link>
             <Link
               href="/settings"
