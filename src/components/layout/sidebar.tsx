@@ -48,15 +48,13 @@ export default function Sidebar({
 
   return (
     <aside
-      className="flex flex-col gap-6 shrink-0"
+      className="flex flex-col gap-6 shrink-0 sidebar-content"
       style={{
         width: 240,
         height: "100vh",
         background: "#0c0c0c",
         borderRight: "1px solid #1f1f1f",
         padding: "32px 20px",
-        position: "sticky",
-        top: 0,
       }}
     >
       {/* Logo */}

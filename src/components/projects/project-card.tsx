@@ -49,17 +49,21 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
         textDecoration: "none",
         color: "inherit",
         display: "block",
+        height: "100%",
       }}
     >
       <div
-        className="flex flex-col gap-3 flex-1"
+        className="project-card flex flex-col gap-2 flex-1"
         style={{
-          padding: 16,
+          padding: "12px 16px",
           background: "#171717",
           border: `1px solid ${borderColor}`,
           minWidth: 0,
+          minHeight: "160px",
+          maxHeight: "none",
           transition: "border-color 0.2s, background 0.2s",
           cursor: "pointer",
+          height: "100%",
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.background = "#1a1a1a";
@@ -69,8 +73,8 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
         }}
       >
         {/* Header: status + platform tags + health */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+          <div className="flex items-center gap-2 flex-wrap">
             <div
               style={{
                 width: 8,
@@ -80,7 +84,13 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
                 flexShrink: 0,
               }}
             />
-            <span style={{ color: cardColor, fontSize: 11 }}>
+            <span
+              style={{
+                color: cardColor,
+                fontSize: "11px",
+                whiteSpace: "nowrap",
+              }}
+            >
               {statusLabel}
             </span>
             {project.health && (
@@ -91,6 +101,7 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
                   gap: 4,
                   color: HEALTH_CONFIG[project.health.status].color,
                   fontSize: 10,
+                  whiteSpace: "nowrap",
                 }}
                 title={`Last ping: ${project.health.lastPing.toLocaleTimeString()}${
                   project.health.responseTime
@@ -123,7 +134,7 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
             {project.platforms.map((p) => (
               <span
                 key={p}
@@ -190,10 +201,16 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
         <p
           style={{
             color: "#e5e5e5",
-            fontSize: 15,
+            fontSize: "clamp(13px, 2.5vw, 15px)",
             fontWeight: 600,
             margin: 0,
+            lineHeight: 1.3,
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
           }}
+          title={project.name}
         >
           {project.name}
         </p>
@@ -202,18 +219,23 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
         <p
           style={{
             color: "#737373",
-            fontSize: 11,
-            lineHeight: 1.6,
+            fontSize: "clamp(10px, 1.8vw, 11px)",
+            lineHeight: 1.5,
             margin: 0,
             flexGrow: 1,
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
           }}
+          title={project.description}
         >
           {project.description}
         </p>
 
         {/* Footer: tech stack + url */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 mt-auto">
+          <div className="flex items-center gap-1 flex-wrap">
             {project.techStack.map((tech) => (
               <span
                 key={tech}
@@ -238,7 +260,12 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
               fontSize: 10,
               textDecoration: "none",
               transition: "color 0.15s",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: "100%",
             }}
+            title={project.url}
           >
             {project.status === "offline" ? "↓ offline" : `${project.url} ↗`}
           </a>

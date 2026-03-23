@@ -35,7 +35,7 @@ export default function FilterTags({
   };
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="filter-tags-container flex items-center gap-2 flex-wrap justify-center">
       <span style={{ color: "#525252", fontSize: 11 }}>filter:</span>
       {allTags.map((tag) => {
         const isActive = active === tag;

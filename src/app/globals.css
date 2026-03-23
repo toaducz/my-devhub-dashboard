@@ -35,3 +35,114 @@ body {
   font-family: "JetBrains Mono", monospace;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Mobile Menu Toggle Button */
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: flex !important;
+  }
+
+  .mobile-sidebar-drawer {
+    display: block !important;
+  }
+
+  .desktop-sidebar {
+    display: none !important;
+  }
+
+  .main-content {
+    padding: 70px 16px 16px 16px !important;
+  }
+}
+
+/* Desktop: hide mobile elements */
+@media (min-width: 769px) {
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+
+  .mobile-sidebar-drawer {
+    display: none !important;
+  }
+
+  .desktop-sidebar {
+    display: block !important;
+  }
+
+  .main-content {
+    padding: 32px 40px !important;
+  }
+}
+
+/* Responsive Grid */
+@media (max-width: 640px) {
+  .project-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .project-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* Stats Row Responsive */
+@media (max-width: 768px) {
+  .stats-row {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .stats-row > div {
+    width: 100% !important;
+    flex: none !important;
+  }
+}
+
+/* Header Responsive */
+@media (max-width: 768px) {
+  .header-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .header-title {
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  .header-title h1 {
+    font-size: 20px !important;
+  }
+
+  .header-actions > div,
+  .header-actions > button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .search-input {
+    width: 100% !important;
+  }
+}
+
+/* Filter Tags Responsive */
+@media (max-width: 768px) {
+  .filter-tags-container {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .filter-tags-container > span {
+    display: none !important;
+  }
+}

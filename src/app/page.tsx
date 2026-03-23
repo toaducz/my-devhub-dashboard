@@ -34,6 +34,7 @@ export default function Home() {
   const [hasEnvToken, setHasEnvToken] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
 
   // Filter out private projects for guests
@@ -316,13 +317,105 @@ export default function Home() {
   }, [visibleProjects]);
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: "#0c0c0c" }}>
-      {/* Sidebar */}
-      <Sidebar
-        onCategoryChange={handleCategoryChange}
-        activeCategory={activeCategory}
-        categories={categoryCounts}
-      />
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        background: "#0c0c0c",
+        position: "relative",
+      }}
+    >
+      {/* Mobile Hamburger Button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="mobile-menu-toggle"
+        style={{
+          position: "fixed",
+          top: 16,
+          left: 16,
+          zIndex: 1001,
+          padding: "8px 12px",
+          background: "#171717",
+          border: "1px solid #1f1f1f",
+          color: "#e5e5e5",
+          cursor: "pointer",
+          borderRadius: 4,
+          display: "none",
+        }}
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {isMobileMenuOpen ? (
+            <>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </>
+          ) : (
+            <>
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </>
+          )}
+        </svg>
+      </button>
+
+      {/* Mobile Sidebar Drawer */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          width: 240,
+          background: "#0c0c0c",
+          borderRight: "1px solid #1f1f1f",
+          transform: isMobileMenuOpen ? "translateX(0)" : "translateX(-100%)",
+          transition: "transform 0.3s ease",
+          zIndex: 1000,
+          display: "none",
+        }}
+        className="mobile-sidebar-drawer"
+      >
+        <Sidebar
+          onCategoryChange={(cat) => {
+            handleCategoryChange(cat);
+            setIsMobileMenuOpen(false);
+          }}
+          activeCategory={activeCategory}
+          categories={categoryCounts}
+        />
+      </div>
+
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.5)",
+            zIndex: 999,
+          }}
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Desktop Sidebar */}
+      <div className="desktop-sidebar">
+        <Sidebar
+          onCategoryChange={handleCategoryChange}
+          activeCategory={activeCategory}
+          categories={categoryCounts}
+        />
+      </div>
 
       {/* Main content */}
       <main
@@ -331,21 +424,27 @@ export default function Home() {
           display: "flex",
           flexDirection: "column",
           gap: 24,
-          padding: "32px 40px",
           overflowY: "auto",
           minWidth: 0,
         }}
+        className="main-content"
       >
         {/* Header */}
         <div
+          className="header-container"
           style={{
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 16,
           }}
         >
           {/* Title */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div
+            className="header-title"
+            style={{ display: "flex", flexDirection: "column", gap: 4 }}
+          >
             <h1
               style={{
                 margin: 0,
@@ -393,7 +492,16 @@ export default function Home() {
           </div>
 
           {/* Actions */}
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div
+            className="header-actions"
+            style={{
+              display: "flex",
+              gap: 8,
+              alignItems: "center",
+              flexWrap: "wrap",
+              justifyContent: "flex-end",
+            }}
+          >
             {/* Privacy Filter - only show when logged in */}
             {user && (
               <div
@@ -440,6 +548,7 @@ export default function Home() {
                 padding: "8px 12px",
                 background: "#171717",
                 border: "1px solid #1f1f1f",
+                minWidth: "200px",
               }}
             >
               <svg
@@ -460,6 +569,7 @@ export default function Home() {
                 placeholder="search projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
                 style={{
                   background: "transparent",
                   border: "none",
@@ -467,7 +577,8 @@ export default function Home() {
                   color: "#525252",
                   fontSize: 12,
                   fontFamily: "inherit",
-                  width: "150px",
+                  width: "100%",
+                  minWidth: 0,
                 }}
               />
             </div>
@@ -579,6 +690,7 @@ export default function Home() {
 
         {/* Project Cards Grid */}
         <div
+          className="project-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",

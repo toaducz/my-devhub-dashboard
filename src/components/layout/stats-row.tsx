@@ -36,7 +36,7 @@ export default function StatsRow({ projects = [] }: StatsRowProps) {
   ];
 
   return (
-    <div className="flex gap-3 w-full">
+    <div className="stats-row flex gap-3 w-full">
       {STAT_ITEMS.map((stat) => (
         <div
           key={stat.label}
