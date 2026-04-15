@@ -39,17 +39,19 @@ export default function Home() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Filter out private projects for guests
   const visibleProjects = useMemo(() => {
-    if (user) return projects; // Logged in users see all projects by default (will apply privacyFilter later)
-    return projects.filter((p) => !p.isPrivate); // Guests only see public projects
-  }, [projects, user]);
+    // While loading auth OR if user is logged in, show everything the API sent
+    // (The API already handles security filtering based on cookies)
+    if (user || authLoading) return projects;
+    return projects.filter((p) => !p.isPrivate);
+  }, [projects, user, authLoading]);
 
   // Filter projects based on category, tag, and privacy (applied to visible projects)
   const filteredProjects = useMemo(() => {
-    const base = user ? projects : visibleProjects; // When logged in, start with all projects to apply privacy filter
+    const base = user || authLoading ? projects : visibleProjects; // When logged in, start with all projects to apply privacy filter
 
     const filtered = base.filter((project: Project) => {
       // Category filter

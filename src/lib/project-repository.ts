@@ -274,7 +274,10 @@ export class ProjectRepository {
 // Singleton instance
 let projectRepository: ProjectRepository | null = null;
 
-export function getProjectRepository(): ProjectRepository {
+export function getProjectRepository(
+  supabase?: SupabaseClient
+): ProjectRepository {
+  if (supabase) return new ProjectRepository(supabase);
   if (!projectRepository) {
     projectRepository = new ProjectRepository();
   }

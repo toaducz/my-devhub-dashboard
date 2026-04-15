@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getAllProjects, createProject } from "@/services/project-service";
 import { requireAuth } from "@/lib/api-auth";
+import { getServerClient } from "@/lib/supabase";
+import { cookies } from "next/headers";
 
 // ─── Zod schema (RULE.md: Luôn validate dữ liệu từ API) ─────────────────────
 
@@ -34,7 +36,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       searchParams.get("sortOrder") ?? "asc"
     );
 
-    const projects = await getAllProjects();
+    const cookieStore = await cookies();
+    const supabase = getServerClient(cookieStore);
+    const projects = await getAllProjects(supabase);
 
     const sorted = [...projects].sort((a, b) => {
       if (sortBy === "name") {

@@ -4,6 +4,7 @@ import {
   type DbProject,
 } from "@/lib/project-repository";
 import type { Project, ProjectPlatform } from "@/types/project";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 // ─── Input types ────────────────────────────────────────────────────────────
 
@@ -34,9 +35,11 @@ export interface UpdateProjectInput {
 
 // ─── Service functions ───────────────────────────────────────────────────────
 
-/** Lấy tất cả projects công khai */
-export async function getAllProjects(): Promise<Project[]> {
-  return getProjectRepository().fetchAllProjects();
+/** Lấy tất cả projects (nếu truyền supabase client đã auth thì lấy được cả private) */
+export async function getAllProjects(
+  supabase?: SupabaseClient
+): Promise<Project[]> {
+  return getProjectRepository(supabase).fetchAllProjects();
 }
 
 /** Lấy chi tiết 1 project theo id */
