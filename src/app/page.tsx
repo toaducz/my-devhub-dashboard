@@ -26,8 +26,8 @@ export default function Home() {
   const [privacyFilter, setPrivacyFilter] = useState<
     "all" | "public" | "private"
   >("all");
-  const [sortBy, setSortBy] = useState<SortBy>("createdAt");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [sortBy, setSortBy] = useState<SortBy>("name");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [projects, setProjects] = useState<Project[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
@@ -158,12 +158,16 @@ export default function Home() {
     );
   };
 
-  // Fetch projects from Supabase on mount
+  // Fetch projects from API on mount and when sort changes
   useEffect(() => {
     const loadProjects = async () => {
       try {
         setIsLoading(true);
-        const data = await fetchProjects();
+        const res = await fetch(
+          `/api/projects?sortBy=${sortBy}&sortOrder=${sortOrder}`
+        );
+        if (!res.ok) throw new Error("Failed to fetch projects from API");
+        const { data } = await res.json();
         setProjects(data);
       } catch (error) {
         console.error("Failed to load projects:", error);
@@ -176,7 +180,7 @@ export default function Home() {
     };
 
     loadProjects();
-  }, []);
+  }, [sortBy, sortOrder]);
 
   // Subscribe to real-time updates
   useEffect(() => {
@@ -296,8 +300,11 @@ export default function Home() {
         );
       }
 
-      // Refetch all projects from database (includes custom + newly synced)
-      const data = await fetchProjects();
+      // Refetch all projects from API (includes custom + newly synced)
+      const dataRes = await fetch(
+        `/api/projects?sortBy=${sortBy}&sortOrder=${sortOrder}`
+      );
+      const { data } = await dataRes.json();
       setProjects(data);
       setLastSyncTime(new Date());
     } catch (error) {

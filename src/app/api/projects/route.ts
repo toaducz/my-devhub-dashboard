@@ -20,8 +20,8 @@ const CreateProjectSchema = z.object({
 
 // ─── Sort params schema ──────────────────────────────────────────────────────
 
-const SortBySchema = z.enum(["name", "createdAt"]).default("createdAt");
-const SortOrderSchema = z.enum(["asc", "desc"]).default("desc");
+const SortBySchema = z.enum(["name", "createdAt"]).default("name");
+const SortOrderSchema = z.enum(["asc", "desc"]).default("asc");
 
 // ─── GET /api/projects ───────────────────────────────────────────────────────
 
@@ -29,9 +29,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url);
 
-    const sortBy = SortBySchema.parse(searchParams.get("sortBy") ?? "createdAt");
+    const sortBy = SortBySchema.parse(searchParams.get("sortBy") ?? "name");
     const sortOrder = SortOrderSchema.parse(
-      searchParams.get("sortOrder") ?? "desc"
+      searchParams.get("sortOrder") ?? "asc"
     );
 
     const projects = await getAllProjects();
