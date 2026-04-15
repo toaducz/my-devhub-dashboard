@@ -108,8 +108,8 @@ export default function Home() {
         });
         return sortOrder === "asc" ? cmp : -cmp;
       }
-      // createdAt — sort by id lexicographic (UUID v4 time-ordered from Supabase)
-      const cmp = a.id.localeCompare(b.id);
+      // createdAt — sort by ISO string
+      const cmp = (a.createdAt || "").localeCompare(b.createdAt || "");
       return sortOrder === "asc" ? cmp : -cmp;
     });
   }, [
@@ -228,6 +228,7 @@ export default function Home() {
             status: dbProject.health_status || "unknown",
           }
         : undefined,
+      createdAt: dbProject.created_at,
     };
   }
 

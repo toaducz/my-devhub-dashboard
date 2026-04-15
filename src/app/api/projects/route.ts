@@ -44,8 +44,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         return sortOrder === "asc" ? cmp : -cmp;
       }
 
-      // sortBy === "createdAt" — fall back to id string order (UUIDs are time-ordered via Supabase default)
-      const cmp = a.id.localeCompare(b.id);
+      // sortBy === "createdAt"
+      const cmp = (a.createdAt || "").localeCompare(b.createdAt || "");
       return sortOrder === "asc" ? cmp : -cmp;
     });
 

@@ -76,6 +76,7 @@ function transformDbProject(dbProject: DbProject): Project {
           status: dbProject.health_status || "unknown",
         }
       : undefined,
+    createdAt: dbProject.created_at,
   };
 }
 
