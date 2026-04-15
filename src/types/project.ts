@@ -25,6 +25,7 @@ export interface Project {
     status: "healthy" | "unhealthy" | "unknown";
     responseTime?: number;
   };
+  createdAt?: string;
 }
 
 export interface CategoryCount {

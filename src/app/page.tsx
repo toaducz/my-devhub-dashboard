@@ -168,7 +168,7 @@ export default function Home() {
         );
         if (!res.ok) throw new Error("Failed to fetch projects from API");
         const { data } = await res.json();
-        setProjects(data);
+        setProjects(ensureProjectDates(data));
       } catch (error) {
         console.error("Failed to load projects:", error);
         setSyncError(
@@ -230,6 +230,19 @@ export default function Home() {
         : undefined,
     };
   }
+
+  // Ensure date strings from JSON are converted to Date objects
+  const ensureProjectDates = (projects: any[]): Project[] => {
+    return projects.map((p) => ({
+      ...p,
+      health: p.health
+        ? {
+            ...p.health,
+            lastPing: new Date(p.health.lastPing),
+          }
+        : undefined,
+    }));
+  };
 
   // Check for Vercel token availability (env or cookie)
   useEffect(() => {
@@ -305,7 +318,7 @@ export default function Home() {
         `/api/projects?sortBy=${sortBy}&sortOrder=${sortOrder}`
       );
       const { data } = await dataRes.json();
-      setProjects(data);
+      setProjects(ensureProjectDates(data));
       setLastSyncTime(new Date());
     } catch (error) {
       console.error("Failed to sync Vercel projects:", error);
