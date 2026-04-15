@@ -17,6 +17,8 @@ import { vercelAPI, type VercelProject } from "@/lib/vercel-api";
 import { useAuth } from "@/lib/contexts";
 
 type CategoryFilter = "active" | "learning" | "research" | "archive" | null;
+type SortBy = "name" | "createdAt";
+type SortOrder = "asc" | "desc";
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>(null);
@@ -24,6 +26,8 @@ export default function Home() {
   const [privacyFilter, setPrivacyFilter] = useState<
     "all" | "public" | "private"
   >("all");
+  const [sortBy, setSortBy] = useState<SortBy>("createdAt");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [projects, setProjects] = useState<Project[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
@@ -47,7 +51,7 @@ export default function Home() {
   const filteredProjects = useMemo(() => {
     const base = user ? projects : visibleProjects; // When logged in, start with all projects to apply privacy filter
 
-    return base.filter((project: Project) => {
+    const filtered = base.filter((project: Project) => {
       // Category filter
       if (activeCategory && project.category !== activeCategory) {
         return false;
@@ -95,6 +99,19 @@ export default function Home() {
 
       return true;
     });
+
+    // Sort
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "name") {
+        const cmp = a.name.localeCompare(b.name, undefined, {
+          sensitivity: "base",
+        });
+        return sortOrder === "asc" ? cmp : -cmp;
+      }
+      // createdAt — sort by id lexicographic (UUID v4 time-ordered from Supabase)
+      const cmp = a.id.localeCompare(b.id);
+      return sortOrder === "asc" ? cmp : -cmp;
+    });
   }, [
     projects,
     visibleProjects,
@@ -103,6 +120,8 @@ export default function Home() {
     activeTag,
     privacyFilter,
     searchQuery,
+    sortBy,
+    sortOrder,
   ]);
 
   const getTitle = () => {
@@ -538,6 +557,59 @@ export default function Home() {
                 ))}
               </div>
             )}
+
+            {/* Sort */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "8px 12px",
+                background: "#171717",
+                border: "1px solid #1f1f1f",
+              }}
+            >
+              <span style={{ color: "#525252", fontSize: 12 }}>sort:</span>
+              {(["name", "createdAt"] as const).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setSortBy(key)}
+                  style={{
+                    padding: "4px 10px",
+                    background: sortBy === key ? "#3b82f6" : "#1a1a1a",
+                    border: sortBy === key ? "none" : "1px solid #252525",
+                    color: sortBy === key ? "#fff" : "#737373",
+                    fontSize: 11,
+                    fontWeight: sortBy === key ? 600 : 400,
+                    fontFamily: "inherit",
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {key === "name" ? "name" : "date"}
+                </button>
+              ))}
+              <button
+                onClick={() =>
+                  setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
+                }
+                title={sortOrder === "asc" ? "Ascending" : "Descending"}
+                style={{
+                  padding: "4px 8px",
+                  background: "#1a1a1a",
+                  border: "1px solid #252525",
+                  color: "#737373",
+                  fontSize: 11,
+                  fontFamily: "inherit",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {sortOrder === "asc" ? "↑" : "↓"}
+              </button>
+            </div>
 
             {/* Search */}
             <div

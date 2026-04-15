@@ -18,12 +18,38 @@ const CreateProjectSchema = z.object({
   isPrivate: z.boolean().default(false),
 });
 
+// ─── Sort params schema ──────────────────────────────────────────────────────
+
+const SortBySchema = z.enum(["name", "createdAt"]).default("createdAt");
+const SortOrderSchema = z.enum(["asc", "desc"]).default("desc");
+
 // ─── GET /api/projects ───────────────────────────────────────────────────────
 
-export async function GET(): Promise<NextResponse> {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
+    const { searchParams } = new URL(req.url);
+
+    const sortBy = SortBySchema.parse(searchParams.get("sortBy") ?? "createdAt");
+    const sortOrder = SortOrderSchema.parse(
+      searchParams.get("sortOrder") ?? "desc"
+    );
+
     const projects = await getAllProjects();
-    return NextResponse.json({ data: projects }, { status: 200 });
+
+    const sorted = [...projects].sort((a, b) => {
+      if (sortBy === "name") {
+        const cmp = a.name.localeCompare(b.name, undefined, {
+          sensitivity: "base",
+        });
+        return sortOrder === "asc" ? cmp : -cmp;
+      }
+
+      // sortBy === "createdAt" — fall back to id string order (UUIDs are time-ordered via Supabase default)
+      const cmp = a.id.localeCompare(b.id);
+      return sortOrder === "asc" ? cmp : -cmp;
+    });
+
+    return NextResponse.json({ data: sorted }, { status: 200 });
   } catch (err: unknown) {
     console.error("[GET /api/projects]", err);
     return NextResponse.json(
